@@ -32,3 +32,21 @@ just dev
 To exit the processes being run with `just`, type `h`, `q`, `Ctrl-C`, and `a`. The first two keys exits vite, the rest exits Erlang (Gleam).
 
 Visit http://localhost:8000
+
+## TODO
+### Protocol
+- Page Object with Deferred Props
+- Page Object with Rescued Deferred Props
+- Page Object with Merge Props
+- Page Object with Scroll Props
+- Page Object with Once Props
+- Asset Versioning
+- Partial Reloads
+- Allow only supported HTTP status codes
+### Enhance the Web Site
+- CSS
+- Layout
+### Developer Experience
+- Hot swapping support
+### Packaging
+- Factor out the Inertia adapter
