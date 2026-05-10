@@ -2,6 +2,7 @@ import gleam/bytes_tree
 import gleam/http.{type Method, Get, Head}
 import gleam/http/request.{type Request as HttpRequest}
 import gleam/http/response
+import gleam/json
 import gleam/list
 import gleam/option.{None}
 import gleam/result
@@ -40,21 +41,51 @@ pub fn middleware(
 }
 
 pub fn inertia_response(
+  req: Request,
   ctx: Context,
   status: Int,
   title: String,
   page: inertia.Page,
 ) -> Response {
-  let body =
-    html([], [
-      html.head([], list.append([html.title([], title)], asset_scripts(ctx))),
-      html.body([], inertia.app_script(page)),
-    ])
-    |> element.to_document_string
-    |> bytes_tree.from_string
+  let url = req.path
 
-  response.Response(status: status, headers: [], body: mist.Bytes(body))
-  |> response.set_header("content-type", "text/html; charset=utf-8")
+  case inertia.is_inertia_request(req) {
+    False -> {
+      let body =
+        html([], [
+          html.head(
+            [],
+            list.append([html.title([], title)], asset_scripts(ctx)),
+          ),
+          html.body([], inertia.app_script(url, page)),
+        ])
+        |> element.to_document_string
+        |> bytes_tree.from_string
+
+      response.Response(
+        status: status,
+        headers: [
+          #("Content-Type", "text/html; charset=utf-8"),
+        ],
+        body: mist.Bytes(body),
+      )
+    }
+    True -> {
+      let body =
+        inertia.page_component_json(url, page)
+        |> json.to_string
+        |> bytes_tree.from_string
+
+      response.Response(
+        status: status,
+        headers: [
+          #("X-Inertia", "true"),
+          #("Content-Type", "application/json"),
+        ],
+        body: mist.Bytes(body),
+      )
+    }
+  }
 }
 
 fn asset_scripts(ctx: Context) -> List(element.Element(msg)) {
