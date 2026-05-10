@@ -7,7 +7,11 @@ import gleam/option.{None}
 import gleam/result
 import gleam/string
 import gleam/uri
+import lustre/attribute
+import lustre/element
+import lustre/element/html.{html}
 import mist
+import utils/inertia
 
 pub type Context {
   Context(static_directory: String, assets: Assets)
@@ -33,6 +37,70 @@ pub fn middleware(
   handle_request: Handler,
 ) -> Response {
   serve_static(req, ctx.static_directory, fn() { handle_request(req) })
+}
+
+pub fn inertia_response(
+  ctx: Context,
+  status: Int,
+  title: String,
+  page: inertia.Page,
+) -> Response {
+  let body =
+    html([], [
+      html.head([], list.append([html.title([], title)], asset_scripts(ctx))),
+      html.body([], inertia.app_script(page)),
+    ])
+    |> element.to_document_string
+    |> bytes_tree.from_string
+
+  response.Response(status: status, headers: [], body: mist.Bytes(body))
+  |> response.set_header("content-type", "text/html; charset=utf-8")
+}
+
+fn asset_scripts(ctx: Context) -> List(element.Element(msg)) {
+  let Context(assets: assets, ..) = ctx
+  case assets {
+    ProductionAssets -> [
+      html.script(
+        [
+          attribute.type_("module"),
+          attribute.src("/static/js/app.js"),
+        ],
+        "",
+      ),
+    ]
+
+    DevelopmentAssets(vite_origin) -> [
+      html.script(
+        [
+          attribute.type_("module"),
+          attribute.src(vite_origin <> "/@vite/client"),
+        ],
+        "",
+      ),
+      html.script(
+        [attribute.type_("module")],
+        react_refresh_preamble(vite_origin),
+      ),
+      html.script(
+        [
+          attribute.type_("module"),
+          attribute.src(vite_origin <> "/src-inertia/app.tsx"),
+        ],
+        "",
+      ),
+    ]
+  }
+}
+
+fn react_refresh_preamble(vite_origin: String) -> String {
+  "import RefreshRuntime from \""
+  <> vite_origin
+  <> "/@react-refresh\"\n"
+  <> "RefreshRuntime.injectIntoGlobalHook(window)\n"
+  <> "window.$RefreshReg$ = () => {}\n"
+  <> "window.$RefreshSig$ = () => (type) => type\n"
+  <> "window.__vite_plugin_react_preamble_installed__ = true\n"
 }
 
 pub fn html_response(body: String) -> Response {

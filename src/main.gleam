@@ -31,7 +31,8 @@ fn static_directory() -> String {
 
 fn assets() -> web.Assets {
   case env.get("DEMO_WEB_ENV") {
-    Ok("development") -> web.DevelopmentAssets(base_url: vite_origin() <> "/static")
+    Ok("development") ->
+      web.DevelopmentAssets(base_url: vite_origin() <> "/static")
 
     _ -> web.ProductionAssets
   }
