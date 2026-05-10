@@ -10,7 +10,12 @@ import gleam/uri
 import mist
 
 pub type Context {
-  Context(static_directory: String)
+  Context(static_directory: String, assets: Assets)
+}
+
+pub type Assets {
+  ProductionAssets
+  DevelopmentAssets(base_url: String)
 }
 
 pub type Request =

@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "private": true,
+  "type": "module",
   "scripts": {
+    "build": "vite build",
+    "dev": "vite dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "packageManager": "pnpm@10.32.1",
@@ -11,5 +14,10 @@
     "@inertiajs/react": "^3.1.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@inertiajs/vite": "^3.1.1",
+    "@vitejs/plugin-react": "^6.0.1",
+    "vite": "^8.0.11"
   }
 }
