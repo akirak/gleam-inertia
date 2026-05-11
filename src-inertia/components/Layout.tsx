@@ -1,8 +1,18 @@
-export default function Layout({ children }) {
+import styles from "./Layout.module.css";
+
+type LayoutProps = {
+  children: React.ReactNode;
+};
+
+export default function Layout({ children }: LayoutProps) {
   return (
-    <div>
-      <header>Header</header>
-      <main>{children}</main>
+    <div className={styles.shell}>
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <span className={styles.brand}>Demo Web</span>
+        </div>
+      </header>
+      <main className={styles.main}>{children}</main>
     </div>
   );
 }

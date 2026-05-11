@@ -1,6 +1,7 @@
 import React from "react";
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
+import "./styles/global.css";
 
 const pages = import.meta.glob<{ default: React.ComponentType<any> }>("./pages/**/*.tsx");
 
@@ -15,7 +16,7 @@ createInertiaApp({
     return (await page()).default;
   },
   setup({ el, App, props }) {
-    // Add a portal for Base UI
+    // Base UI assumes "root" class
     createRoot(el).render(
       <div className="root">
         <App {...props} />

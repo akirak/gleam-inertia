@@ -1,0 +1,32 @@
+@import "./tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color: var(--color-text);
+  background: var(--color-background);
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--color-accent-strong);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
