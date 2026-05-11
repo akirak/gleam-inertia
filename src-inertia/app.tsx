@@ -15,6 +15,11 @@ createInertiaApp({
     return (await page()).default;
   },
   setup({ el, App, props }) {
-    createRoot(el).render(<App {...props} />);
+    // Add a portal for Base UI
+    createRoot(el).render(
+      <div className="root">
+        <App {...props} />
+      </div>,
+    );
   },
 });
