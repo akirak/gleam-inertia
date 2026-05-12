@@ -77,7 +77,7 @@ Visit http://localhost:8000
 - Partial Reloads
 - Allow only supported HTTP status codes
 ### Enhance the Web Site
-- CSS
+- ~~CSS~~
 - ~~Layout~~
 ### Developer Experience
 - Hot swapping support
