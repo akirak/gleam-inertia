@@ -21,9 +21,21 @@
       packages = eachSystem (_system: _pkgs: { });
 
       devShells = eachSystem (
-        _system: pkgs: {
+        _system: pkgs:
+        let
+          # Use only Chrome for E2E during local development
+          playwright-browsers = pkgs.playwright-driver.browsers.override {
+            withFirefox = false;
+            withWebkit = false;
+            withFfmpeg = false;
+            # fontconfig_file = { fontDirectories = []; };
+          };
+
+          browserProgram = if pkgs.stdenv.targetPlatform.isLinux then "chrome" else "Chromium";
+        in
+        {
           default = pkgs.mkShell {
-            buildInputs = [
+            packages = [
               pkgs.gleam
               pkgs.${beamVersion}.erlang
               pkgs.${beamVersion}.rebar3
@@ -31,6 +43,7 @@
               pkgs.corepack
               pkgs.typescript-go
               pkgs.just
+              playwright-browsers
             ]
             ++ lib.optional pkgs.stdenv.isLinux pkgs.inotify-tools
             ++ (lib.optionals pkgs.stdenv.isDarwin (
@@ -40,6 +53,11 @@
                 CoreServices
               ]
             ));
+
+            shellHook = ''
+              browser_executable="$(find -L '${playwright-browsers}' -name ${browserProgram} -type f)"
+              export PLAYWRIGHT_BROWSER_EXECUTABLE_PATH="''${browser_executable}"
+            '';
           };
         }
       );
