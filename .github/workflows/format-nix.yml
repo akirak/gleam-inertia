@@ -20,7 +20,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Nix
-        uses: cachix/install-nix-action@725982224c
+        uses: cachix/install-nix-action@725982224ce3b974b7abc7df9ca873679eda8939
 
       - name: Check Nix formatting
         run: nix fmt -- --fail-on-change
