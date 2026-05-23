@@ -1,0 +1,65 @@
+name: E2E tests
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+          - webkit
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+
+      - name: Set up Erlang, Rebar3, and Gleam
+        uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9
+        with:
+          otp-version: "28"
+          gleam-version: "1.16.0"
+          rebar3-version: "3"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@41ff726
+        with:
+          version: 10.32.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Gleam dependencies
+        run: gleam deps download
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run E2E suite
+        run: pnpm exec playwright test --project ${{ matrix.browser }}
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          if-no-files-found: ignore
