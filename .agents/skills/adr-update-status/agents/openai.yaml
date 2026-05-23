@@ -1,0 +1,4 @@
+interface:
+  display_name: "ADR Status Updater"
+  short_description: "Update ADR status fields"
+  default_prompt: "Use $adr-update-status to mark ADR 0001 as accepted."
