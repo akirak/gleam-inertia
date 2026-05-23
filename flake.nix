@@ -49,6 +49,7 @@
           treefmt.programs = {
             deadnix.enable = true;
             nixfmt.enable = true;
+            zizmor.enable = true;
           };
 
           devShells.default = pkgs.mkShell {
