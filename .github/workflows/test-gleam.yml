@@ -32,5 +32,6 @@ jobs:
       - name: Check Gleam formatting
         run: gleam format --check src test
 
-      - name: Run Gleam tests
-        run: gleam test
+      # No tests at present.
+      # - name: Run Gleam tests
+      #   run: gleam test
