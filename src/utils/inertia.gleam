@@ -280,35 +280,35 @@ pub fn page_component_json(url: String, page: Page) -> json.Json {
   json.object(fields)
 }
 
-pub fn is_inertia_request(request: request.Request(mist.Connection)) -> Bool {
-  case header(request, "x-inertia") {
+pub fn is_inertia_request(req: request.Request(mist.Connection)) -> Bool {
+  case header(req, "x-inertia") {
     Some(value) -> value == "true"
     None -> False
   }
 }
 
-pub fn request_url(request: request.Request(mist.Connection)) -> String {
-  case request.get_query(request) {
-    Ok([]) | Error(_) -> request.path
-    Ok(query) -> request.path <> "?" <> uri.query_to_string(query)
+pub fn request_url(req: request.Request(mist.Connection)) -> String {
+  case request.get_query(req) {
+    Ok([]) | Error(_) -> req.path
+    Ok(query) -> req.path <> "?" <> uri.query_to_string(query)
   }
 }
 
 pub fn header(
-  request: request.Request(mist.Connection),
+  req: request.Request(mist.Connection),
   key: String,
 ) -> Option(String) {
-  case request.get_header(request, string.lowercase(key)) {
+  case request.get_header(req, string.lowercase(key)) {
     Ok(value) -> Some(value)
     Error(_) -> None
   }
 }
 
 pub fn header_csv(
-  request: request.Request(mist.Connection),
+  req: request.Request(mist.Connection),
   key: String,
 ) -> List(String) {
-  case header(request, key) {
+  case header(req, key) {
     Some(value) ->
       value
       |> string.split(on: ",")
@@ -320,22 +320,22 @@ pub fn header_csv(
 }
 
 pub fn is_partial_reload_for(
-  request: request.Request(mist.Connection),
+  req: request.Request(mist.Connection),
   component: String,
 ) -> Bool {
-  header(request, "x-inertia-partial-component") == Some(component)
+  header(req, "x-inertia-partial-component") == Some(component)
 }
 
 pub fn should_include_prop(
-  request: request.Request(mist.Connection),
+  req: request.Request(mist.Connection),
   component: String,
   key: String,
 ) -> Bool {
-  case is_partial_reload_for(request, component) {
+  case is_partial_reload_for(req, component) {
     False -> True
     True -> {
-      let only = header_csv(request, "x-inertia-partial-data")
-      let except = header_csv(request, "x-inertia-partial-except")
+      let only = header_csv(req, "x-inertia-partial-data")
+      let except = header_csv(req, "x-inertia-partial-except")
 
       case list.contains(except, key) {
         True -> False
@@ -350,22 +350,22 @@ pub fn should_include_prop(
 }
 
 pub fn should_skip_once_prop(
-  request: request.Request(mist.Connection),
+  req: request.Request(mist.Connection),
   component: String,
   prop_name: String,
   once_key: String,
 ) -> Bool {
-  let loaded_keys = header_csv(request, "x-inertia-except-once-props")
+  let loaded_keys = header_csv(req, "x-inertia-except-once-props")
 
   case list.contains(loaded_keys, once_key) {
     False -> False
     True -> {
-      let requested_props = case is_partial_reload_for(request, component) {
-        True -> header_csv(request, "x-inertia-partial-data")
+      let requested_props = case is_partial_reload_for(req, component) {
+        True -> header_csv(req, "x-inertia-partial-data")
         False -> []
       }
 
-      let excluded_props = header_csv(request, "x-inertia-partial-except")
+      let excluded_props = header_csv(req, "x-inertia-partial-except")
 
       case list.contains(excluded_props, prop_name) {
         True -> True
