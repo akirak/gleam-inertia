@@ -46,7 +46,7 @@ pub fn inertia_response(
   status: Int,
   page: inertia.Page,
 ) -> Response {
-  let url = req.path
+  let url = inertia.request_url(req)
 
   case inertia.is_inertia_request(req) {
     False -> {
