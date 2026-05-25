@@ -27,15 +27,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1766688795,
-        "narHash": "sha256-v2ICvF6VzwEzVX5qVUs/KuOfqPqjOq+NpmsI3j1zEF8=",
-        "owner": "arnarg",
+        "lastModified": 1779731396,
+        "narHash": "sha256-BpFaDYLUpBLdMQcxTFGfpLRbuhqmf2aT8CjFNDIfwAE=",
+        "owner": "akirak",
         "repo": "nix-gleam",
-        "rev": "fd6945ed3919b87a0edcc791f3a91b43cf25a371",
+        "rev": "5559292bad5278ef87b4212e510386cc9fcbaa37",
         "type": "github"
       },
       "original": {
-        "owner": "arnarg",
+        "owner": "akirak",
+        "ref": "develop",
         "repo": "nix-gleam",
         "type": "github"
       }

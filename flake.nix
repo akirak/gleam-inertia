@@ -2,7 +2,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-gleam = {
-      url = "github:arnarg/nix-gleam";
+      url = "github:akirak/nix-gleam/develop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
