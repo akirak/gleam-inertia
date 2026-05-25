@@ -54,7 +54,7 @@ Then run development servers.
 You can run the following two commands simultaneously:
 ``` sh
 pnpm dev
-DEMO_WEB_ENV=development gleam run -m main
+DEMO_WEB_ENV=development gleam run -m demo_web
 ```
 
 You can also use `just`:
