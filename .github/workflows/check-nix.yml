@@ -1,4 +1,4 @@
-name: Nix Format
+name: Nix Checks
 
 on:
   push:
@@ -22,5 +22,5 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@725982224ce3b974b7abc7df9ca873679eda8939
 
-      - name: Check Nix formatting
-        run: nix fmt -- --fail-on-change
+      - name: Check
+        run: nix flake check -L
