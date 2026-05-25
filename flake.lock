@@ -20,23 +20,47 @@
         "type": "github"
       }
     },
-    "nixpkgs": {
+    "nix-gleam": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1779475168,
-        "narHash": "sha256-gm3D4FF9EcZlXK/ZnsC6IYzpEQplOoT+LPTurzOPyrk=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "a0991c886dc83e6e9de01d5266e4842985b1850e",
+        "lastModified": 1779731396,
+        "narHash": "sha256-BpFaDYLUpBLdMQcxTFGfpLRbuhqmf2aT8CjFNDIfwAE=",
+        "owner": "akirak",
+        "repo": "nix-gleam",
+        "rev": "5559292bad5278ef87b4212e510386cc9fcbaa37",
         "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
+        "owner": "akirak",
+        "ref": "develop",
+        "repo": "nix-gleam",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1779593580,
+        "narHash": "sha256-le3WvQyzAQjBZnb7q2c8C5Fk2c9LgN/Oq+b0KiD4fM4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d849bb215dcdf71bce3e686839ccdb4219e84b2f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
+        "nix-gleam": "nix-gleam",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
       }

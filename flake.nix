@@ -1,5 +1,11 @@
 {
   inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nix-gleam = {
+      url = "github:akirak/nix-gleam/develop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -12,6 +18,7 @@
 
   outputs =
     inputs@{
+      self,
       flake-parts,
       nixpkgs,
       treefmt-nix,
@@ -31,7 +38,11 @@
       perSystem =
         { system, ... }:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = nixpkgs.legacyPackages.${system}.extend (
+            _: _: {
+              inherit (inputs.nix-gleam.packages.${system}) buildGleamApplication;
+            }
+          );
 
           # Use only Chrome for E2E during local development
           playwright-browsers = pkgs.playwright-driver.browsers.override {
@@ -44,7 +55,34 @@
           browserProgram = if pkgs.stdenv.targetPlatform.isLinux then "chrome" else "Chromium";
         in
         {
-          packages = { };
+          packages = {
+            # A self-contained package for deploying the entire app as a single
+            # container image
+            default = self.packages.${system}.server.overrideAttrs (old: {
+              nativeBuildInuts = (old.nativeBuildInputs or [ ]) ++ [
+                self.packages.${system}.client
+              ];
+
+              preBuild = ''
+                cp -ar "${self.packages.${system}.client}/share/priv" .
+              '';
+            });
+
+            server = pkgs.callPackage ./gleam.nix {
+              inherit (pkgs.${beamVersion}) erlang rebar3;
+              src = lib.cleanSourceWith {
+                src = self.outPath;
+                filter = path: _: path != "src-inertia" && path != "docs";
+              };
+            };
+
+            client = pkgs.callPackage ./assets.nix {
+              src = lib.cleanSourceWith {
+                src = self.outPath;
+                filter = path: _: path != "priv" && path != "src";
+              };
+            };
+          };
 
           treefmt.programs = {
             deadnix.enable = true;
@@ -78,6 +116,8 @@
               export PLAYWRIGHT_ONLY_CHROMIUM=1
             '';
           };
+
+          checks = self.packages.${system};
         };
     };
 }
