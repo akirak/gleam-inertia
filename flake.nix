@@ -63,6 +63,12 @@
                 filter = path: _: path != "src-inertia" && path != "docs";
               };
             };
+
+            client = pkgs.callPackage ./assets.nix {
+              src = lib.cleanSourceWith {
+                src = self.outPath;
+                filter = path: _: path != "priv" && path != "src";
+              };
             };
           };
 
