@@ -1,0 +1,4 @@
+interface:
+  display_name: "pnpmDeps Hash Updater"
+  short_description: "Refresh the Nix pnpmDeps hash"
+  default_prompt: "Use $update-pnpm-deps-hash to update the client pnpmDeps hash after frontend dependency changes."
