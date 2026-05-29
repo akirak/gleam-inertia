@@ -26,7 +26,7 @@
     }:
     let
       inherit (nixpkgs) lib;
-      beamVersion = "beam28Packages";
+      beamVersion = "beamMinimal28Packages";
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
