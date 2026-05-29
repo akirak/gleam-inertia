@@ -42,6 +42,21 @@ needed to make it comfortable.
 
 If you are a Nix user, the flake.nix in this repository provides all of the
 above dependencies via the development shell.
+
+## Running
+### Using Nix
+Running the self-contained (server + frontend) package:
+``` shell
+nix run
+```
+### Using the Nix-based Docker image
+#### Podman
+``` shell
+nix build .#docker-image && (zcat result | podman load)
+podman run -ti --rm -p 8000:8000 localhost/gleam-inertia-demo:latest
+```
+#### Docker
+TODO
 ## Development
 First install the dependencies:
 

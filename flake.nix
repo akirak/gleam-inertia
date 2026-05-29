@@ -26,7 +26,7 @@
     }:
     let
       inherit (nixpkgs) lib;
-      beamVersion = "beam28Packages";
+      beamVersion = "beamMinimal28Packages";
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
@@ -82,6 +82,29 @@
                 filter = path: _: path != "priv" && path != "src";
               };
             };
+
+            docker-image = pkgs.dockerTools.buildImage {
+              name = "gleam-inertia-demo";
+              tag = "latest";
+
+              copyToRoot = [
+                self.packages.${system}.default
+                pkgs.coreutils
+              ];
+
+              config = {
+                Entrypoint = [
+                  "${self.packages.${system}.default}/bin/demo_web"
+                ];
+                Cmd = [
+                  "--bind"
+                  "0.0.0.0"
+                ];
+              };
+
+              diskSize = 1024;
+              buildVMMemorySize = 512;
+            };
           };
 
           treefmt.programs = {
@@ -117,7 +140,7 @@
             '';
           };
 
-          checks = self.packages.${system};
+          checks = lib.filterAttrs (name: _: name != "docker-image") self.packages.${system};
         };
     };
 }
