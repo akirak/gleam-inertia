@@ -102,11 +102,11 @@ the About page, and the dynamic greet route.
 
 ## TODO
 ### Protocol
-- Page Object with Deferred Props
-- Page Object with Rescued Deferred Props
-- Page Object with Merge Props
-- Page Object with Scroll Props
-- Page Object with Once Props
+- ~~Page Object with Deferred Props~~
+- ~~Page Object with Rescued Deferred Props~~
+- ~~Page Object with Merge Props~~
+- ~~Page Object with Scroll Props~~
+- ~~Page Object with Once Props~~
 - Asset Versioning
 - Partial Reloads
 - Allow only supported HTTP status codes
