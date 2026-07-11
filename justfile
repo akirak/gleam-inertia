@@ -2,12 +2,12 @@
 dev: gleam_dev pnpm_dev
 
 pnpm_dev:
-    pnpm dev
+    pnpm --dir examples/mist dev
 
 gleam_dev:
-    DEMO_WEB_ENV=development gleam run -m demo_web
+    cd examples/mist && DEMO_WEB_ENV=development gleam run -m demo_web
 
 install:
     gleam deps download
-    (cd packages/inertia && gleam deps download)
-    pnpm install
+    (cd examples/mist && gleam deps download)
+    pnpm --dir examples/mist install

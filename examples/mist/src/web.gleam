@@ -8,7 +8,7 @@ import gleam/option.{None}
 import gleam/result
 import gleam/string
 import gleam/uri
-import inertia
+import http_inertia
 import lustre/attribute
 import lustre/element
 import lustre/element/html.{html}
@@ -45,11 +45,11 @@ pub fn inertia_response(
   ctx: Context,
   status: Int,
   title: String,
-  page: inertia.Page,
+  page: http_inertia.Page,
 ) -> Response {
-  let url = inertia.request_url(req)
+  let url = http_inertia.request_url(req)
 
-  case inertia.is_inertia_request(req) {
+  case http_inertia.is_inertia_request(req) {
     False -> {
       let body =
         html([], [
@@ -62,7 +62,7 @@ pub fn inertia_response(
             ]
               |> list.append(asset_tags(ctx)),
           ),
-          html.body([], inertia.app_script(url, page)),
+          html.body([], http_inertia.app_script(url, page)),
         ])
         |> element.to_document_string
         |> bytes_tree.from_string
@@ -77,7 +77,7 @@ pub fn inertia_response(
     }
     True -> {
       let body =
-        inertia.page_component_json(url, page)
+        http_inertia.page_component_json(url, page)
         |> json.to_string
         |> bytes_tree.from_string
 
