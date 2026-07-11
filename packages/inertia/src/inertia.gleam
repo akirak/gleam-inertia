@@ -7,7 +7,6 @@ import gleam/uri
 import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
-import mist
 
 pub type Page {
   Page(
@@ -280,24 +279,21 @@ pub fn page_component_json(url: String, page: Page) -> json.Json {
   json.object(fields)
 }
 
-pub fn is_inertia_request(req: request.Request(mist.Connection)) -> Bool {
+pub fn is_inertia_request(req: request.Request(connection)) -> Bool {
   case header(req, "x-inertia") {
     Some(value) -> value == "true"
     None -> False
   }
 }
 
-pub fn request_url(req: request.Request(mist.Connection)) -> String {
+pub fn request_url(req: request.Request(connection)) -> String {
   case request.get_query(req) {
     Ok([]) | Error(_) -> req.path
     Ok(query) -> req.path <> "?" <> uri.query_to_string(query)
   }
 }
 
-pub fn header(
-  req: request.Request(mist.Connection),
-  key: String,
-) -> Option(String) {
+pub fn header(req: request.Request(connection), key: String) -> Option(String) {
   case request.get_header(req, string.lowercase(key)) {
     Ok(value) -> Some(value)
     Error(_) -> None
@@ -305,7 +301,7 @@ pub fn header(
 }
 
 pub fn header_csv(
-  req: request.Request(mist.Connection),
+  req: request.Request(connection),
   key: String,
 ) -> List(String) {
   case header(req, key) {
@@ -320,14 +316,14 @@ pub fn header_csv(
 }
 
 pub fn is_partial_reload_for(
-  req: request.Request(mist.Connection),
+  req: request.Request(connection),
   component: String,
 ) -> Bool {
   header(req, "x-inertia-partial-component") == Some(component)
 }
 
 pub fn should_include_prop(
-  req: request.Request(mist.Connection),
+  req: request.Request(connection),
   component: String,
   key: String,
 ) -> Bool {
@@ -350,7 +346,7 @@ pub fn should_include_prop(
 }
 
 pub fn should_skip_once_prop(
-  req: request.Request(mist.Connection),
+  req: request.Request(connection),
   component: String,
   prop_name: String,
   once_key: String,

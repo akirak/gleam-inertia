@@ -8,11 +8,11 @@ import gleam/option.{None}
 import gleam/result
 import gleam/string
 import gleam/uri
+import inertia
 import lustre/attribute
 import lustre/element
 import lustre/element/html.{html}
 import mist
-import utils/inertia
 
 pub type Context {
   Context(static_directory: String, assets: Assets)
