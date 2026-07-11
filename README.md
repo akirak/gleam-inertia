@@ -102,6 +102,10 @@ the About page, and the dynamic greet route.
 
 ## TODO
 ### Protocol
+This project aims to implement [the Inertia protocol
+(v3)](https://inertiajs.com/docs/v3/core-concepts/the-protocol) faithfully in
+Gleam.
+
 - ~~Page Object with Deferred Props~~
 - ~~Page Object with Rescued Deferred Props~~
 - ~~Page Object with Merge Props~~
