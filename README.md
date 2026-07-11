@@ -1,5 +1,9 @@
 # http_inertia
 
+[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/http_inertia)
+[![Hex.pm](https://img.shields.io/hexpm/v/http_inertia)](https://hex.pm/packages/http_inertia)
+[![License](https://img.shields.io/hexpm/l/http_inertia)](https://github.com/akirak/gleam-inertia/blob/main/LICENSE)
+
 `http_inertia` is a server-agnostic [Inertia](https://inertiajs.com/) protocol
 adapter for [Gleam](https://gleam.run/). It works with
 [`gleam/http`](https://hexdocs.pm/gleam_http/) request values and supplies the
