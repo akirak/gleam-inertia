@@ -1,7 +1,7 @@
 name = "http_inertia"
 version = "0.1.0"
 description = "A server-agnostic Inertia protocol adapter for gleam/http"
-licences = ["MIT"]
+licences = ["Apache-2.0"]
 
 [dependencies]
 gleam_stdlib = ">= 1.0.0 and < 2.0.0"
