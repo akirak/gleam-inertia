@@ -1,5 +1,5 @@
 name = "http_inertia"
-version = "0.1.0"
+version = "0.1.1"
 description = "A server-agnostic Inertia protocol adapter for gleam/http"
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "akirak", repo = "gleam-inertia" }
