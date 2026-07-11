@@ -1,3 +1,8 @@
+/// Server-side helpers for creating Inertia page objects and inspecting
+/// Inertia requests.
+///
+/// This module is server-agnostic: it works with `gleam/http` request values
+/// and produces the page data consumed by an Inertia client.
 import gleam/http/request
 import gleam/json
 import gleam/list
@@ -8,6 +13,10 @@ import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 
+/// An Inertia page object returned to the client.
+///
+/// Create a page with [`page`](#page), then use the `with_*` functions to add
+/// optional protocol metadata.
 pub type Page {
   Page(
     component: String,
@@ -21,14 +30,19 @@ pub type Page {
   )
 }
 
+/// The asset version included in an Inertia page object.
 pub type Version {
+  /// A concrete asset version string.
   StringVersion(String)
+  /// No asset version. This is encoded as JSON `null`.
   NullVersion
 }
 
+/// Deferred prop names grouped by the group that loads them.
 pub type DeferredProps =
   List(#(String, List(String)))
 
+/// Metadata that controls how the client merges props during a visit.
 pub type MergeProps {
   MergeProps(
     append: List(String),
@@ -38,6 +52,7 @@ pub type MergeProps {
   )
 }
 
+/// Pagination metadata for a scrollable prop.
 pub type ScrollProp {
   ScrollProp(
     page_name: String,
@@ -47,16 +62,23 @@ pub type ScrollProp {
   )
 }
 
+/// Scroll metadata keyed by the corresponding prop name.
 pub type ScrollProps =
   List(#(String, ScrollProp))
 
+/// Metadata for a prop that the client should load only once.
 pub type OnceProp {
   OnceProp(prop: String, expires_at: Option(Int))
 }
 
+/// Once-prop metadata keyed by the corresponding prop name.
 pub type OnceProps =
   List(#(String, OnceProp))
 
+/// Creates an Inertia page with no optional protocol metadata.
+///
+/// Use the `with_*` functions to add deferred, merge, scroll, rescued, or
+/// once-prop metadata.
 pub fn page(
   component component: String,
   props props: List(#(String, json.Json)),
@@ -74,10 +96,14 @@ pub fn page(
   )
 }
 
+/// Returns merge metadata with every prop list empty.
 pub fn empty_merge_props() -> MergeProps {
   MergeProps(append: [], prepend: [], deep_merge: [], match_on: [])
 }
 
+/// Creates metadata that controls how the client merges the specified props.
+///
+/// Each list contains prop paths understood by the Inertia client.
 pub fn merge_props(
   append append: List(String),
   prepend prepend: List(String),
@@ -92,6 +118,9 @@ pub fn merge_props(
   )
 }
 
+/// Creates pagination metadata for a scrollable prop.
+///
+/// `previous_page` and `next_page` are encoded as JSON `null` when absent.
 pub fn scroll_prop(
   page_name page_name: String,
   previous_page previous_page: Option(Int),
@@ -106,6 +135,9 @@ pub fn scroll_prop(
   )
 }
 
+/// Creates metadata for a prop the client should load only once.
+///
+/// `expires_at` is a Unix timestamp and is encoded as JSON `null` when absent.
 pub fn once_prop(
   prop prop: String,
   expires_at expires_at: Option(Int),
@@ -113,6 +145,7 @@ pub fn once_prop(
   OnceProp(prop: prop, expires_at: expires_at)
 }
 
+/// Returns `page` with its deferred-prop metadata replaced by `deferred_props`.
 pub fn with_deferred_props(page: Page, deferred_props: DeferredProps) -> Page {
   let Page(
     component: component,
@@ -137,6 +170,7 @@ pub fn with_deferred_props(page: Page, deferred_props: DeferredProps) -> Page {
   )
 }
 
+/// Returns `page` with its rescued deferred-prop names replaced by `rescued_props`.
 pub fn with_rescued_props(page: Page, rescued_props: List(String)) -> Page {
   let Page(
     component: component,
@@ -161,6 +195,7 @@ pub fn with_rescued_props(page: Page, rescued_props: List(String)) -> Page {
   )
 }
 
+/// Returns `page` with its merge metadata replaced by `merge_props`.
 pub fn with_merge_props(page: Page, merge_props: MergeProps) -> Page {
   let Page(
     component: component,
@@ -185,6 +220,7 @@ pub fn with_merge_props(page: Page, merge_props: MergeProps) -> Page {
   )
 }
 
+/// Returns `page` with its scroll metadata replaced by `scroll_props`.
 pub fn with_scroll_props(page: Page, scroll_props: ScrollProps) -> Page {
   let Page(
     component: component,
@@ -209,6 +245,7 @@ pub fn with_scroll_props(page: Page, scroll_props: ScrollProps) -> Page {
   )
 }
 
+/// Returns `page` with its once-prop metadata replaced by `once_props`.
 pub fn with_once_props(page: Page, once_props: OnceProps) -> Page {
   let Page(
     component: component,
@@ -233,6 +270,10 @@ pub fn with_once_props(page: Page, once_props: OnceProps) -> Page {
   )
 }
 
+/// Renders the initial Inertia application elements.
+///
+/// The result contains the `#app` mount element and a JSON script element with
+/// the initial page data for the client to read.
 pub fn app_script(url: String, page: Page) -> List(Element(msg)) {
   [
     html.div([attribute.id("app")], []),
@@ -246,6 +287,9 @@ pub fn app_script(url: String, page: Page) -> List(Element(msg)) {
   ]
 }
 
+/// Encodes a page object in the JSON shape required by the Inertia protocol.
+///
+/// Empty optional metadata is omitted from the returned object.
 pub fn page_component_json(url: String, page: Page) -> json.Json {
   let Page(
     component: component,
@@ -279,6 +323,7 @@ pub fn page_component_json(url: String, page: Page) -> json.Json {
   json.object(fields)
 }
 
+/// Returns `True` when `req` includes `X-Inertia: true`.
 pub fn is_inertia_request(req: request.Request(connection)) -> Bool {
   case header(req, "x-inertia") {
     Some(value) -> value == "true"
@@ -286,6 +331,9 @@ pub fn is_inertia_request(req: request.Request(connection)) -> Bool {
   }
 }
 
+/// Returns the request path with its encoded query string when one is present.
+///
+/// If the query string cannot be parsed, this returns the path alone.
 pub fn request_url(req: request.Request(connection)) -> String {
   case request.get_query(req) {
     Ok([]) | Error(_) -> req.path
@@ -293,6 +341,9 @@ pub fn request_url(req: request.Request(connection)) -> String {
   }
 }
 
+/// Looks up a request header case-insensitively.
+///
+/// Returns `None` when the header is absent.
 pub fn header(req: request.Request(connection), key: String) -> Option(String) {
   case request.get_header(req, string.lowercase(key)) {
     Ok(value) -> Some(value)
@@ -300,6 +351,9 @@ pub fn header(req: request.Request(connection), key: String) -> Option(String) {
   }
 }
 
+/// Splits a comma-separated request header into trimmed, non-empty values.
+///
+/// Returns an empty list when the header is absent or has no values.
 pub fn header_csv(
   req: request.Request(connection),
   key: String,
@@ -315,6 +369,7 @@ pub fn header_csv(
   }
 }
 
+/// Returns `True` when `req` is a partial reload for `component`.
 pub fn is_partial_reload_for(
   req: request.Request(connection),
   component: String,
@@ -322,6 +377,11 @@ pub fn is_partial_reload_for(
   header(req, "x-inertia-partial-component") == Some(component)
 }
 
+/// Returns whether a prop should be included in the response.
+///
+/// Props are included for full visits. For partial reloads, the
+/// `X-Inertia-Partial-Data` and `X-Inertia-Partial-Except` headers determine
+/// whether `key` is included; `except` takes precedence over `only`.
 pub fn should_include_prop(
   req: request.Request(connection),
   component: String,
@@ -345,6 +405,10 @@ pub fn should_include_prop(
   }
 }
 
+/// Returns whether an already-loaded once prop should be omitted from a response.
+///
+/// The decision uses `X-Inertia-Except-Once-Props` and, for partial reloads,
+/// the partial-data and partial-except headers.
 pub fn should_skip_once_prop(
   req: request.Request(connection),
   component: String,
