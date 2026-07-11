@@ -1,93 +1,85 @@
 # http_inertia
 
-`http_inertia` is a server-agnostic [Inertia](https://inertiajs.com/)
-protocol adapter for [gleam/http](https://hexdocs.pm/gleam_http/). It provides
-page-object encoding, initial-page markup, request detection, partial reload
-filtering, and once-prop handling without depending on a specific Gleam HTTP
-server.
+`http_inertia` is a server-agnostic [Inertia](https://inertiajs.com/) protocol
+adapter for [Gleam](https://gleam.run/). It works with
+[`gleam/http`](https://hexdocs.pm/gleam_http/) request values and supplies the
+server-side pieces needed to build Inertia responses: page-object encoding,
+initial-page markup, request inspection, and prop-selection helpers.
 
-The package currently has first-class usage coverage through the
-[Mist example](examples/mist). Its public API works with `gleam/http` request
-types so other server integrations can be built without adding a server
-dependency to this package.
-
-By using this package, you can:
-
-- Use React for view code without adding a Node.js application server.
-- Treat Inertia as the boundary between server routes and client pages.
-- Preserve BEAM runtime strengths, especially predictable concurrency through
-  its preemptive scheduler.
-
-Unsupported use cases:
-
-- Complex frontend: Client states should be kept minimal unless necessary
-- Running the Gleam backend on a JavaScript runtime or WASM (like Cloudflare
-  Workers)
+It does not depend on a particular HTTP server or response type. Your web
+framework remains responsible for turning the generated page data into an HTTP
+response and serving the Inertia client assets.
 
 ## Installation
-
-Add `http_inertia` to your Gleam project:
 
 ```sh
 gleam add http_inertia
 ```
 
-Then import the public module:
+## Creating a page
+
+Create a `Page` with a component name, JSON props, and an asset version. Encode
+it with `page_component_json` when returning an Inertia response.
 
 ```gleam
+import gleam/json
 import http_inertia
+
+let page =
+  http_inertia.page(
+    component: "users/index",
+    props: [
+      #("users", json.array(["Ada"], of: json.string)),
+      #("errors", json.object([])),
+    ],
+    version: http_inertia.StringVersion("asset-version"),
+  )
+
+let page_json = http_inertia.page_component_json("/users", page)
 ```
 
-## Development
+For the initial non-Inertia visit, `app_script` produces the `#app` mount
+element and the JSON page-data script expected by the Inertia client:
 
-Run the package tests from the repository root:
-
-```sh
-gleam test
+```gleam
+let elements = http_inertia.app_script("/users", page)
 ```
 
-The repository's `flake.nix` remains focused on the Mist example. Run its
-combined server and frontend with:
+## Request helpers
 
-```sh
-nix run
+Use `is_inertia_request` to distinguish an Inertia visit from an initial page
+load. `request_url` returns the path and query string for the current request.
+
+For partial reloads, use `is_partial_reload_for` together with
+`should_include_prop` before doing work to load optional props:
+
+```gleam
+let include_permissions =
+  http_inertia.is_partial_reload_for(req, "users/index")
+  && http_inertia.should_include_prop(req, "users/index", "permissions")
 ```
 
-See [examples/mist/README.md](examples/mist/README.md) for development and E2E
-test instructions.
+`should_skip_once_prop` applies the corresponding request rules for props
+registered with `once_prop` and `with_once_props`.
 
-## Protocol Status
+## Protocol metadata
 
-This package aims to implement the [Inertia protocol
-(v3)](https://inertiajs.com/docs/v3/core-concepts/the-protocol) faithfully.
+Start with `page`, then use the `with_*` functions to attach optional Inertia
+metadata:
 
-- [x] Page objects with deferred props
-- [x] Page objects with rescued deferred props
-- [x] Page objects with merge props
-- [x] Page objects with scroll props
-- [x] Page objects with once props
-- [ ] Asset versioning
-- [ ] Partial reloads
-- [ ] Restrict responses to supported HTTP status codes
+- `with_deferred_props` and `with_rescued_props`
+- `with_merge_props`
+- `with_scroll_props`
+- `with_once_props`
 
-## Why?
+See the [`http_inertia` module documentation](https://hexdocs.pm/http_inertia/http_inertia.html)
+for each function's API and the [Mist example](https://github.com/akirak/gleam-inertia/tree/main/examples/mist)
+for a complete server integration.
 
-After trying [TanStack Start](https://tanstack.com/start/latest) in a few
-personal projects, I wanted a deployment model that does not require
-self-hosting a Node.js server for application logic. Bun is interesting, but it
-does not change the main trade-off: the runtime still becomes part of the
-server-side frontend stack.
+## Further resources
 
-For my homelab, I want that server-side boundary to run on the Erlang VM
-(BEAM). Elixir and Phoenix LiveView are strong options, but Gleam is a better
-fit for the kind of small, typed Backend-For-Frontend (BFF) layer I want to
-write. The missing piece is a low-friction frontend story. I still want to build
-the interface in React, keep client state minimal, and avoid inventing a new
-server-side web framework for Gleam.
-
-Inertia provides a useful protocol for that shape of application: Gleam can own
-routing, data preparation, and HTTP responses while React owns the interactive
-views.
+- [Inertia protocol documentation](https://inertiajs.com/docs/v3/core-concepts/the-protocol)
+- [Repository and development notes](https://github.com/akirak/gleam-inertia/blob/main/DEVELOPMENT.md)
 
 ## Acknowledgements
 
