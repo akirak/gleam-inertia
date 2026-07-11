@@ -11,6 +11,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.6.0
         version: 1.6.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@inertiajs/core':
+        specifier: ^3.6.1
+        version: 3.6.1
       '@inertiajs/react':
         specifier: ^3.6.1
         version: 3.6.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
