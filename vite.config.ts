@@ -1,13 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import inertia from "@inertiajs/vite";
 
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
   base: "/static/",
-  plugins: [inertia({ ssr: false }), react()],
+  plugins: [react()],
+  server: {
+    // Avoid transform waterfalls when the server first serves a page module.
+    warmup: {
+      clientFiles: ["./src-inertia/app.tsx", "./src-inertia/pages/**/*.tsx"],
+    },
+  },
   css: {
     transformer: "lightningcss",
     lightningcss: {
