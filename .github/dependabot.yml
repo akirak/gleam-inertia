@@ -14,7 +14,7 @@ updates:
           - "*"
 
   - package-ecosystem: npm
-    directory: /
+    directory: /examples/mist
     schedule:
       interval: weekly
     labels:

@@ -70,17 +70,11 @@
 
             server = pkgs.callPackage ./gleam.nix {
               inherit (pkgs.${beamVersion}) erlang rebar3;
-              src = lib.cleanSourceWith {
-                src = self.outPath;
-                filter = path: _: path != "src-inertia" && path != "docs";
-              };
+              src = ./examples/mist;
             };
 
             client = pkgs.callPackage ./assets.nix {
-              src = lib.cleanSourceWith {
-                src = self.outPath;
-                filter = path: _: path != "priv" && path != "src";
-              };
+              src = ./examples/mist;
             };
 
             docker-image = pkgs.dockerTools.buildImage {

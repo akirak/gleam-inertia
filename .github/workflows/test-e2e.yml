@@ -43,18 +43,23 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: examples/mist/pnpm-lock.yaml
 
       - name: Install JavaScript dependencies
         run: pnpm install --frozen-lockfile
+        working-directory: examples/mist
 
       - name: Install Gleam dependencies
         run: gleam deps download
+        working-directory: examples/mist
 
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+        working-directory: examples/mist
 
       - name: Run E2E suite
         run: pnpm exec playwright test --project ${{ matrix.browser }}
+        working-directory: examples/mist
         continue-on-error: ${{ matrix.browser == 'webkit' }}
 
       - name: Upload Playwright report
@@ -62,5 +67,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report-${{ matrix.browser }}
-          path: playwright-report/
+          path: examples/mist/playwright-report/
           if-no-files-found: ignore

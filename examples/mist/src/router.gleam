@@ -5,7 +5,7 @@ import gleam/json
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/result
-import inertia
+import http_inertia
 import utils/about.{get_system_version}
 import web
 
@@ -34,12 +34,12 @@ fn home(req: web.Request, ctx: web.Context) -> web.Response {
   use <- web.require_methods(req, [Get, Head])
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "home",
       props: [
         #("errors", json.object([])),
       ],
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
 
   web.inertia_response(req, ctx, 200, "Demo Home", page)
@@ -49,13 +49,13 @@ fn greet(name: String, req: web.Request, ctx: web.Context) -> web.Response {
   use <- web.require_methods(req, [Get, Head])
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "greet",
       props: [
         #("name", json.string(name)),
         #("errors", json.object([])),
       ],
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
 
   web.inertia_response(req, ctx, 200, "Greet", page)
@@ -67,13 +67,13 @@ fn about(req: web.Request, ctx: web.Context) -> web.Response {
   let version = get_system_version()
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "about",
       props: [
         #("systemVersion", json.string(version)),
         #("errors", json.object([])),
       ],
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
 
   web.inertia_response(req, ctx, 200, "About", page)
@@ -84,14 +84,14 @@ fn deferred_demo(req: web.Request, ctx: web.Context) -> web.Response {
 
   let component = "protocol/deferred"
   let load_permissions =
-    inertia.is_partial_reload_for(req, component)
-    && inertia.should_include_prop(req, component, "permissions")
+    http_inertia.is_partial_reload_for(req, component)
+    && http_inertia.should_include_prop(req, component, "permissions")
   let load_analytics =
-    inertia.is_partial_reload_for(req, component)
-    && inertia.should_include_prop(req, component, "analytics")
+    http_inertia.is_partial_reload_for(req, component)
+    && http_inertia.should_include_prop(req, component, "analytics")
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: component,
       props: [#("errors", json.object([]))]
         |> append_prop(
@@ -121,9 +121,9 @@ fn deferred_demo(req: web.Request, ctx: web.Context) -> web.Response {
             #("queueDepth", json.int(6)),
           ]),
         ),
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
-    |> inertia.with_deferred_props([
+    |> http_inertia.with_deferred_props([
       #("default", ["permissions"]),
       #("insights", ["analytics"]),
     ])
@@ -137,12 +137,12 @@ fn deferred_rescue_demo(req: web.Request, ctx: web.Context) -> web.Response {
   let component = "protocol/deferred_rescue"
   let retry = query_int(req, "retry", 0)
   let wants_permissions =
-    inertia.is_partial_reload_for(req, component)
-    && inertia.should_include_prop(req, component, "permissions")
+    http_inertia.is_partial_reload_for(req, component)
+    && http_inertia.should_include_prop(req, component, "permissions")
   let rescued_permissions = wants_permissions && retry == 0
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: component,
       props: [#("errors", json.object([]))]
         |> append_prop(
@@ -163,10 +163,10 @@ fn deferred_rescue_demo(req: web.Request, ctx: web.Context) -> web.Response {
             of: fn(value) { value },
           ),
         ),
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
-    |> inertia.with_deferred_props([#("default", ["permissions"])])
-    |> inertia.with_rescued_props(case rescued_permissions {
+    |> http_inertia.with_deferred_props([#("default", ["permissions"])])
+    |> http_inertia.with_rescued_props(case rescued_permissions {
       True -> ["permissions"]
       False -> []
     })
@@ -182,7 +182,7 @@ fn merge_demo(req: web.Request, ctx: web.Context) -> web.Response {
   let bounded_batch = clamp(batch, 1, 2)
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: component,
       props: [#("errors", json.object([]))]
         |> append_prop(
@@ -214,10 +214,10 @@ fn merge_demo(req: web.Request, ctx: web.Context) -> web.Response {
           _ -> alerts_batch_two()
         })
         |> append_prop("hasMore", json.bool(bounded_batch < 2)),
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
-    |> inertia.with_merge_props(
-      inertia.merge_props(
+    |> http_inertia.with_merge_props(
+      http_inertia.merge_props(
         append: ["posts"],
         prepend: ["alerts"],
         deep_merge: ["summary"],
@@ -235,26 +235,26 @@ fn scroll_demo(req: web.Request, ctx: web.Context) -> web.Response {
   let current_page = clamp(query_int(req, "page", 1), 1, 3)
 
   let page =
-    inertia.page(
+    http_inertia.page(
       component: component,
       props: [
         #("errors", json.object([])),
         #("posts", scroll_posts_json(current_page)),
       ],
-      version: inertia.NullVersion,
+      version: http_inertia.NullVersion,
     )
-    |> inertia.with_merge_props(
-      inertia.merge_props(
+    |> http_inertia.with_merge_props(
+      http_inertia.merge_props(
         append: ["posts.data"],
         prepend: [],
         deep_merge: [],
         match_on: [],
       ),
     )
-    |> inertia.with_scroll_props([
+    |> http_inertia.with_scroll_props([
       #(
         "posts",
-        inertia.scroll_prop(
+        http_inertia.scroll_prop(
           page_name: "page",
           previous_page: case current_page > 1 {
             True -> Some(current_page - 1)
@@ -312,23 +312,23 @@ fn once_page(
   prop_name: String,
   page_label: String,
   generated_at: String,
-) -> inertia.Page {
+) -> http_inertia.Page {
   let once_key = "catalog"
 
-  inertia.page(
+  http_inertia.page(
     component: component,
     props: [#("errors", json.object([]))]
       |> append_prop("pageLabel", json.string(page_label))
       |> append_prop("serverLabel", json.string("fresh-on-every-response"))
       |> append_prop_if(
-        !inertia.should_skip_once_prop(req, component, prop_name, once_key),
+        !http_inertia.should_skip_once_prop(req, component, prop_name, once_key),
         prop_name,
         once_catalog_json(generated_at),
       ),
-    version: inertia.NullVersion,
+    version: http_inertia.NullVersion,
   )
-  |> inertia.with_once_props([
-    #(once_key, inertia.once_prop(prop: prop_name, expires_at: None)),
+  |> http_inertia.with_once_props([
+    #(once_key, http_inertia.once_prop(prop: prop_name, expires_at: None)),
   ])
 }
 

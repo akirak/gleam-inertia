@@ -2,7 +2,7 @@
   "name": "demo_web",
   "version": "1.0.0",
   "private": true,
-  "description": "",
+  "description": "Mist example application for http_inertia",
   "type": "module",
   "scripts": {
     "build": "vite build",

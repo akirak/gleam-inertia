@@ -1,7 +1,7 @@
 import gleam/json
 import gleam/option.{None, Some}
 import gleeunit
-import inertia
+import http_inertia
 
 pub fn main() -> Nil {
   gleeunit.main()
@@ -9,15 +9,15 @@ pub fn main() -> Nil {
 
 pub fn page_object_with_deferred_props_test() {
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "Posts/Index",
       props: [
         #("errors", json.object([])),
         #("user", json.object([#("name", json.string("Jonathan"))])),
       ],
-      version: inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
+      version: http_inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
     )
-    |> inertia.with_deferred_props([
+    |> http_inertia.with_deferred_props([
       #("default", ["comments", "analytics"]),
       #("sidebar", ["relatedPosts"]),
     ])
@@ -43,18 +43,18 @@ pub fn page_object_with_deferred_props_test() {
       ),
     ])
 
-  assert json.to_string(inertia.page_component_json("/posts", page))
+  assert json.to_string(http_inertia.page_component_json("/posts", page))
     == json.to_string(expected)
 }
 
 pub fn page_object_with_rescued_deferred_props_test() {
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "Users/Index",
       props: [#("errors", json.object([]))],
-      version: inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
+      version: http_inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
     )
-    |> inertia.with_rescued_props(["permissions"])
+    |> http_inertia.with_rescued_props(["permissions"])
 
   let expected =
     json.object([
@@ -65,13 +65,13 @@ pub fn page_object_with_rescued_deferred_props_test() {
       #("rescuedProps", json.array(["permissions"], of: json.string)),
     ])
 
-  assert json.to_string(inertia.page_component_json("/users", page))
+  assert json.to_string(http_inertia.page_component_json("/users", page))
     == json.to_string(expected)
 }
 
 pub fn page_object_with_merge_props_test() {
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "Feed/Index",
       props: [
         #("errors", json.object([])),
@@ -122,10 +122,10 @@ pub fn page_object_with_merge_props_test() {
           ]),
         ),
       ],
-      version: inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
+      version: http_inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
     )
-    |> inertia.with_merge_props(
-      inertia.merge_props(
+    |> http_inertia.with_merge_props(
+      http_inertia.merge_props(
         append: ["posts"],
         prepend: ["notifications"],
         deep_merge: ["conversations"],
@@ -202,13 +202,13 @@ pub fn page_object_with_merge_props_test() {
       ),
     ])
 
-  assert json.to_string(inertia.page_component_json("/feed", page))
+  assert json.to_string(http_inertia.page_component_json("/feed", page))
     == json.to_string(expected)
 }
 
 pub fn page_object_with_scroll_props_test() {
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "Posts/Index",
       props: [
         #("errors", json.object([])),
@@ -234,20 +234,20 @@ pub fn page_object_with_scroll_props_test() {
           ]),
         ),
       ],
-      version: inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
+      version: http_inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
     )
-    |> inertia.with_merge_props(
-      inertia.merge_props(
+    |> http_inertia.with_merge_props(
+      http_inertia.merge_props(
         append: ["posts.data"],
         prepend: [],
         deep_merge: [],
         match_on: [],
       ),
     )
-    |> inertia.with_scroll_props([
+    |> http_inertia.with_scroll_props([
       #(
         "posts",
-        inertia.scroll_prop(
+        http_inertia.scroll_prop(
           page_name: "page",
           previous_page: None,
           next_page: Some(2),
@@ -305,13 +305,13 @@ pub fn page_object_with_scroll_props_test() {
       ),
     ])
 
-  assert json.to_string(inertia.page_component_json("/posts?page=1", page))
+  assert json.to_string(http_inertia.page_component_json("/posts?page=1", page))
     == json.to_string(expected)
 }
 
 pub fn page_object_with_once_props_test() {
   let page =
-    inertia.page(
+    http_inertia.page(
       component: "Billing/Plans",
       props: [
         #("errors", json.object([])),
@@ -329,10 +329,10 @@ pub fn page_object_with_once_props_test() {
           ),
         ),
       ],
-      version: inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
+      version: http_inertia.StringVersion("6b16b94d7c51cbe5b1fa42aac98241d5"),
     )
-    |> inertia.with_once_props([
-      #("plans", inertia.once_prop(prop: "plans", expires_at: None)),
+    |> http_inertia.with_once_props([
+      #("plans", http_inertia.once_prop(prop: "plans", expires_at: None)),
     ])
 
   let expected =
@@ -376,6 +376,6 @@ pub fn page_object_with_once_props_test() {
       ),
     ])
 
-  assert json.to_string(inertia.page_component_json("/billing/plans", page))
+  assert json.to_string(http_inertia.page_component_json("/billing/plans", page))
     == json.to_string(expected)
 }

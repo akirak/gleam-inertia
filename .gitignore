@@ -13,3 +13,4 @@ test-results
 
 # Generated
 /priv/static
+/examples/mist/priv/static

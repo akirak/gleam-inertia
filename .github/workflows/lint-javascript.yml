@@ -29,12 +29,16 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: examples/mist/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        working-directory: examples/mist
 
       - name: Check formatting
         run: pnpm format:check
+        working-directory: examples/mist
 
       - name: Run linter
         run: pnpm lint
+        working-directory: examples/mist

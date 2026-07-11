@@ -1,8 +1,77 @@
-# Gleam + Inertia Demo Application
+# http_inertia
 
-This is a Gleam [Mist](https://github.com/rawhat/mist) application using [Inertia](https://inertiajs.com/) to provide a React frontend while running on Erlang VM (BEAM).
+`http_inertia` is a server-agnostic [Inertia](https://inertiajs.com/)
+protocol adapter for [gleam/http](https://hexdocs.pm/gleam_http/). It provides
+page-object encoding, initial-page markup, request detection, partial reload
+filtering, and once-prop handling without depending on a specific Gleam HTTP
+server.
 
-## Rationale
+The package currently has first-class usage coverage through the
+[Mist example](examples/mist). Its public API works with `gleam/http` request
+types so other server integrations can be built without adding a server
+dependency to this package.
+
+By using this package, you can:
+
+- Use React for view code without adding a Node.js application server.
+- Treat Inertia as the boundary between server routes and client pages.
+- Preserve BEAM runtime strengths, especially predictable concurrency through
+  its preemptive scheduler.
+
+Unsupported use cases:
+
+- Complex frontend: Client states should be kept minimal unless necessary
+- Running the Gleam backend on a JavaScript runtime or WASM (like Cloudflare
+  Workers)
+
+## Installation
+
+Add `http_inertia` to your Gleam project:
+
+```sh
+gleam add http_inertia
+```
+
+Then import the public module:
+
+```gleam
+import http_inertia
+```
+
+## Development
+
+Run the package tests from the repository root:
+
+```sh
+gleam test
+```
+
+The repository's `flake.nix` remains focused on the Mist example. Run its
+combined server and frontend with:
+
+```sh
+nix run
+```
+
+See [examples/mist/README.md](examples/mist/README.md) for development and E2E
+test instructions.
+
+## Protocol Status
+
+This package aims to implement the [Inertia protocol
+(v3)](https://inertiajs.com/docs/v3/core-concepts/the-protocol) faithfully.
+
+- [x] Page objects with deferred props
+- [x] Page objects with rescued deferred props
+- [x] Page objects with merge props
+- [x] Page objects with scroll props
+- [x] Page objects with once props
+- [ ] Asset versioning
+- [ ] Partial reloads
+- [ ] Restrict responses to supported HTTP status codes
+
+## Why?
+
 After trying [TanStack Start](https://tanstack.com/start/latest) in a few
 personal projects, I wanted a deployment model that does not require
 self-hosting a Node.js server for application logic. Bun is interesting, but it
@@ -18,125 +87,9 @@ server-side web framework for Gleam.
 
 Inertia provides a useful protocol for that shape of application: Gleam can own
 routing, data preparation, and HTTP responses while React owns the interactive
-views. This repository explores that project structure and the adapter code
-needed to make it comfortable.
+views.
 
-The reusable Gleam adapter is a separate package in
-[`packages/inertia`](packages/inertia). The demo application consumes it as a
-local path dependency.
+## Acknowledgements
 
-## Goals
-- Keep the backend small, typed, and easy to reason about in Gleam.
-- Use React for view code without adding a Node.js application server.
-- Treat Inertia as the boundary between server routes and client pages.
-- Preserve BEAM runtime strengths, especially predictable concurrency through
-  its preemptive scheduler.
-- Make the project structure simple enough to reuse for small BFF-style
-  applications.
-
-## Non-Goals
-- Complex frontend: Client states should be kept minimal unless necessary
-- Running the Gleam backend on a JavaScript runtime or WASM (like Cloudflare
-  Workers)
-
-## Prerequisites
-- Gleam
-- Erlang (tested on Erlang 28)
-- Node.js + pnpm
-
-If you are a Nix user, the flake.nix in this repository provides all of the
-above dependencies via the development shell.
-
-## Running
-### Using Nix
-Running the self-contained (server + frontend) package:
-``` shell
-nix run
-```
-### Using the Nix-based Docker image
-#### Podman
-``` shell
-nix build .#docker-image && (zcat result | podman load)
-podman run -ti --rm -p 8000:8000 localhost/gleam-inertia-demo:latest
-```
-#### Docker
-TODO
-## Development
-First install the dependencies:
-
-``` sh
-# `just install` is a shorthand recipe for these commands
-gleam deps download
-(cd packages/inertia && gleam deps download)
-pnpm install
-```
-
-Then run development servers.
-You can run the following two commands simultaneously:
-``` sh
-pnpm dev
-DEMO_WEB_ENV=development gleam run -m demo_web
-```
-
-You can also use `just`:
-``` sh
-just dev
-```
-
-To exit the processes being run with `just`, type `h`, `q`, `Ctrl-C`, and `a`. The first two keys exits vite, the rest exits Erlang (Gleam).
-
-Visit http://localhost:8000
-
-## End-to-End Tests
-
-Install the browser automation dependencies once:
-
-``` sh
-pnpm install
-pnpm exec playwright install --with-deps chromium
-```
-
-Run the E2E suite:
-
-``` sh
-pnpm test:e2e
-```
-
-Playwright starts both the Vite dev server and the Gleam application server for
-the test run. The initial suite covers the home page, client-side navigation to
-the About page, and the dynamic greet route.
-
-## Adapter Tests
-
-Run the package's protocol tests independently:
-
-```sh
-cd packages/inertia
-gleam test
-```
-
-## TODO
-### Protocol
-This project aims to implement [the Inertia protocol
-(v3)](https://inertiajs.com/docs/v3/core-concepts/the-protocol) faithfully in
-Gleam.
-
-- ~~Page Object with Deferred Props~~
-- ~~Page Object with Rescued Deferred Props~~
-- ~~Page Object with Merge Props~~
-- ~~Page Object with Scroll Props~~
-- ~~Page Object with Once Props~~
-- Asset Versioning
-- Partial Reloads
-- Allow only supported HTTP status codes
-### Enhance the Web Site
-- ~~CSS~~
-- ~~Layout~~
-### Developer Experience
-- Hot swapping support
-### Packaging
-- ~~Factor out the Inertia adapter~~
-
-## Thanks
-[wisp_inertia](https://github.com/keuller/wisp_inertia) package by Keuller
-Magalhães is an inspiration of this repository.
+[wisp_inertia](https://github.com/keuller/wisp_inertia) by Keuller Magalhaes
+inspired this package.
