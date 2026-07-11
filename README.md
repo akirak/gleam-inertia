@@ -65,6 +65,7 @@ TODO
 First install the dependencies:
 
 ``` sh
+# `just install` is a shorthand recipe for these commands
 gleam deps download
 (cd packages/inertia && gleam deps download)
 pnpm install
