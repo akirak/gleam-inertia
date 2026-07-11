@@ -21,6 +21,10 @@ routing, data preparation, and HTTP responses while React owns the interactive
 views. This repository explores that project structure and the adapter code
 needed to make it comfortable.
 
+The reusable Gleam adapter is a separate package in
+[`packages/inertia`](packages/inertia). The demo application consumes it as a
+local path dependency.
+
 ## Goals
 - Keep the backend small, typed, and easy to reason about in Gleam.
 - Use React for view code without adding a Node.js application server.
@@ -62,6 +66,7 @@ First install the dependencies:
 
 ``` sh
 gleam deps download
+(cd packages/inertia && gleam deps download)
 pnpm install
 ```
 
@@ -100,6 +105,15 @@ Playwright starts both the Vite dev server and the Gleam application server for
 the test run. The initial suite covers the home page, client-side navigation to
 the About page, and the dynamic greet route.
 
+## Adapter Tests
+
+Run the package's protocol tests independently:
+
+```sh
+cd packages/inertia
+gleam test
+```
+
 ## TODO
 ### Protocol
 This project aims to implement [the Inertia protocol
@@ -120,7 +134,7 @@ Gleam.
 ### Developer Experience
 - Hot swapping support
 ### Packaging
-- Factor out the Inertia adapter
+- ~~Factor out the Inertia adapter~~
 
 ## Thanks
 [wisp_inertia](https://github.com/keuller/wisp_inertia) package by Keuller

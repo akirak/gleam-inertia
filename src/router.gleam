@@ -5,8 +5,8 @@ import gleam/json
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/result
+import inertia
 import utils/about.{get_system_version}
-import utils/inertia
 import web
 
 pub fn make_handler(ctx: web.Context) -> web.Handler {

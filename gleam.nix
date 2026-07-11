@@ -11,4 +11,5 @@ buildGleamApplication {
   erlangPackage = erlang;
   rebar3Package = rebar3;
   inherit src;
+  localPackages = [ ./packages/inertia ];
 }
