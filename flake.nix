@@ -114,7 +114,7 @@
               pkgs.${beamVersion}.rebar3
               pkgs.nodejs
               pkgs.corepack
-              pkgs.typescript-go
+              pkgs.typescript
               pkgs.just
               playwright-browsers
             ]
